@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+     {
+       "src": "build_site.py",
+        "command": "python build_site.py",
+        "out": "site"
+     }
+  ]
+}
