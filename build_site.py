@@ -37,8 +37,6 @@ def preprocess_markdown(text):
     import re
     # Add blank line before * or - list items not preceded by blank line or list item
     text = re.sub(r'(?m)^(?![ \t]*[\*\-] )(.+)\n([ \t]*[\*\-] )', r'\1\n\n\2', text)
-    # Add blank line before numbered list items not preceded by blank line or list item
-    text = re.sub(r'(?m)^(?![ \t]*\d+\. )(.+)\n([ \t]*\d+\. )', r'\1\n\n\2', text)
     return text
 
 def fix_mojibake(text):
