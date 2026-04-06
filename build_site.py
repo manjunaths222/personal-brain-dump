@@ -33,10 +33,12 @@ SECTION_META = {
 }
 
 def preprocess_markdown(text):
-    """Ensure blank lines before list blocks so Python-markdown recognizes them."""
+    """Ensure blank lines around bullet list blocks for proper rendering."""
     import re
-    # Add blank line before * or - list items not preceded by blank line or list item
+    # Add blank line before first bullet item in each block
     text = re.sub(r'(?m)^(?![ \t]*[\*\-] )(.+)\n([ \t]*[\*\-] )', r'\1\n\n\2', text)
+    # Add blank line after last bullet item before non-bullet, non-blank line
+    text = re.sub(r'(?m)^([ \t]*[\*\-] [^\n]+)\n(?![ \t]*[\*\-] )(?!\n)(.)', r'\1\n\n\2', text)
     return text
 
 def fix_mojibake(text):
@@ -48,6 +50,7 @@ def fix_mojibake(text):
 
 md_proc = markdown.Markdown(extensions=[
     FencedCodeExtension(),
+    'markdown.extensions.nl2br',
     CodeHiliteExtension(linenums=False, css_class='highlight'),
     TableExtension(),
     TocExtension(permalink=True),
