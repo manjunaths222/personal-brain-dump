@@ -32,6 +32,15 @@ SECTION_META = {
     "quick-references":    {"label": "Quick References",        "icon": "📌",  "color": "#94a3b8"},
 }
 
+def preprocess_markdown(text):
+    """Ensure blank lines before list blocks so Python-markdown recognizes them."""
+    import re
+    # Add blank line before * or - list items not preceded by blank line or list item
+    text = re.sub(r'(?m)^(?![ \t]*[\*\-] )(.+)\n([ \t]*[\*\-] )', r'\1\n\n\2', text)
+    # Add blank line before numbered list items not preceded by blank line or list item
+    text = re.sub(r'(?m)^(?![ \t]*\d+\. )(.+)\n([ \t]*\d+\. )', r'\1\n\n\2', text)
+    return text
+
 def fix_mojibake(text):
     """Fix Windows-1252 mojibake from Apple Notes/clipboard exports."""
     try:
@@ -44,12 +53,12 @@ md_proc = markdown.Markdown(extensions=[
     CodeHiliteExtension(linenums=False, css_class='highlight'),
     TableExtension(),
     TocExtension(permalink=True),
-    'markdown.extensions.nl2br',
 ])
 
 def md_to_html(text):
     md_proc.reset()
     text = fix_mojibake(text)
+    text = preprocess_markdown(text)
     text = re.sub(r'^---\n.*?\n---\n', '', text, flags=re.DOTALL)
     html = md_proc.convert(text)
     # Auto-link bare URLs that aren't already inside href/src attributes
