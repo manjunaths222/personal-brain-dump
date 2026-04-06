@@ -44,7 +44,14 @@ md_proc = markdown.Markdown(extensions=[
 def md_to_html(text):
     md_proc.reset()
     text = re.sub(r'^---\n.*?\n---\n', '', text, flags=re.DOTALL)
-    return md_proc.convert(text)
+    html = md_proc.convert(text)
+    # Auto-link bare URLs that aren't already inside href/src attributes
+    html = re.sub(
+        r'(?<!["\'=>])(https?://[^\s<>"\')\]]+)',
+        r'<a href="\1" target="_blank" rel="noopener noreferrer">\1</a>',
+        html
+    )
+    return html
 
 def extract_title(text):
     fm = re.search(r'^---\ntitle: "(.+?)"\n---', text, re.DOTALL)
