@@ -32,17 +32,24 @@ SECTION_META = {
     "quick-references":    {"label": "Quick References",        "icon": "📌",  "color": "#94a3b8"},
 }
 
+def fix_mojibake(text):
+    """Fix Windows-1252 mojibake from Apple Notes/clipboard exports."""
+    try:
+        return text.encode('cp1252').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+
 md_proc = markdown.Markdown(extensions=[
     FencedCodeExtension(),
     CodeHiliteExtension(linenums=False, css_class='highlight'),
     TableExtension(),
     TocExtension(permalink=True),
     'markdown.extensions.nl2br',
-    'markdown.extensions.sane_lists',
 ])
 
 def md_to_html(text):
     md_proc.reset()
+    text = fix_mojibake(text)
     text = re.sub(r'^---\n.*?\n---\n', '', text, flags=re.DOTALL)
     html = md_proc.convert(text)
     # Auto-link bare URLs that aren't already inside href/src attributes
